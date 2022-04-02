@@ -54,6 +54,10 @@ this.$route.meta
 拆分组件：结构+样式+图片资源
 一共要拆分为七个组件
 
+---三级联动组件完成
+    由于三级联动，在Home、Search、Detail，把三级联动注册为全局组件，
+        好处：只需要注册一次，就可以在全局的任意地方使用
+
 
 
 
@@ -62,6 +66,30 @@ this.$route.meta
 
 
 3)axios二次封装
+    为什么需要二次封装？
+        请求拦截器：可以再发请求之前处理一些业务。
+        响应拦截器：当服务器数据返回后，可以处理一些事情·
+
+    在项目中api文件夹用来放axios请求
+
+接口统一管理
+    项目小：完全可以在组件的生命周期发请求
+    项目大：
+
+跨域问题
+    什么是跨越：协议、域名、端口号不同请求，称为跨域
+    跨域的解决方案： JSONP\CROS\代理
+
+nprogress 进度条的使用
+    需要下载：cnpm i --save nprogress
+    // 引进精度条，还得引入精度条样式
+    import nprogress from 'nprogress'
+    // 引入样式
+    import "nprogress/nprogress.css"
+    nprogress.start()  代表精度条开始
+    nprogress.done()   代表精度条结束
+
+
 AJAX:客户端可以'敲敲的'向服务器端发请求，在页面没有刷新的情况下，实现页面的局部更新。
 XMLHttpRequest、$、fetch、axios
 跨域:如果多次请求协议、域名、端口号有不同的地方，称之为跨域
