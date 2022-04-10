@@ -5,9 +5,10 @@ import nprogress from 'nprogress'
 // 引入样式
 import "nprogress/nprogress.css"
 // 可以在nprogress.css里的#nprogress .bar里修改精度条样式
-
 // 1.利用axios的对象方法create创建一axios实例
 // 2.requests就是axios，只不过稍微配置一下
+// 在当前模块引起store
+import store from '@/store'
 const requests = axios.create({
     // 基础路径
     baseURL: '/api',
@@ -19,6 +20,7 @@ const requests = axios.create({
 requests.interceptors.request.use((config) => {
     // config配置对象，里面有一个很重要的属性，headers请求头
     // 精度条开始动
+    console.log(store);
     nprogress.start()
     return config;
 })

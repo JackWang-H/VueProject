@@ -73,12 +73,13 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt">
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <input autocomplete="off" class="itxt" v-model="skuNum" @change="changeSkuNum">
+                <a href="javascript:" class="plus" @click="skuNum++">+</a>
+                <a href="javascript:" class="mins" @click="skuNum>1?skuNum--:skuNum=1">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <!-- 进行路由跳转之前，发请求把购买的产品信息通过请求的方式同志服务器，服务器进行相应的存储 -->
+                <a @click="addShopCart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -335,7 +336,12 @@
 
   export default {
     name: 'Detail',
-
+    data() {
+      return {
+        // 购买产品的个数
+        skuNum: 1
+      }
+    },
     components: {
       ImageList,
       Zoom
@@ -347,7 +353,6 @@
       }
     },
     mounted() {
-      console.log(this.$route.params.skuid);
       this.$store.dispatch('getGoodInfo', this.$route.params.skuid)
     },
     methods: {
@@ -356,7 +361,39 @@
           item.isChecked = 0
         });
         spuSaleAttrValue.isChecked = 1
-      }
+      },
+      changeSkuNum(event) {
+        let value = event.target.value * 1
+        if (isNaN(value) || value < 1) {
+          this.skuNum = 1
+        } else {
+          this.skuNum = parseInt(value)
+        }
+      },
+      async addShopCart() {
+        // 1.发请求---将产品加入到数据库（通知服务器）
+        /*
+          当前是派发一个action，也向服务器发请求，判断加入购物车是成功了还是失败了 
+          this.$store.dispatch('addOrUpdateShopCart', { skuId: this.$route.params.skuid, skuNum: this.skuNum })
+          上面代码说明了：调用仓库中addOrUpdateShopCart，这个方法加上asyc，返回一定是个Promise
+          要么成功，要么失败，所以这里需要知道是否成功
+         */
+        try {
+          await this.$store.dispatch('addOrUpdateShopCart', { skuId: this.$route.params.skuid, skuNum: this.skuNum })
+          // 跳转路由
+          // 在进行路由跳转的时候还需要将产品信息带给下一级的路由组件
+          // 下面的这种手段路由跳转一级传递参数可以，但是地址栏很恶心，不好看
+          // this.$router.push({ name: 'addcartsuccess', query: { skuInfo: this.skuInfo, skuNum: this.skuNum } })
+          // 所以这里我们自带简单的数据,简单的数据就用query
+          // 产品信息的数据{skuInfo}比较复杂，通过会话存储
+          sessionStorage.setItem('SKUINFO', JSON.stringify(this.skuInfo))
+          this.$router.push({ name: 'addcartsuccess', query: { skuNum: this.skuNum } })
+        } catch (error) {
+          alert(error.message)
+        }
+        // 2.服务器存储成功---进行路由跳转传递参数
+        // 3.失败，给用户提示
+      },
     },
   }
 </script>

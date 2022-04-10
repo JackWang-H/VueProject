@@ -1,7 +1,9 @@
-import{ reqGoodsInfo } from '@/api'
-
+import{ reqGoodsInfo ,reqAddOrUpdateShopCart} from '@/api'
+import {getUUID} from '@/utils/uuid_token'
 const state = {
-    goodInfo:{},
+    goodInfo: {},
+    // 游客的临时身份
+    uuid_token:getUUID()
 }
 const mutations = {
     GETGOODINFO(state,goodInfo) {
@@ -9,10 +11,21 @@ const mutations = {
     }
 }
 const actions = {
+    // 获取产品信息
     async getGoodInfo({commit},skuid) {
         let result =await reqGoodsInfo(skuid)
         if (result.code == 200) {
             commit('GETGOODINFO',result.data)
+        }
+    },
+    // 将产品添加到购物车中
+    async addOrUpdateShopCart({ commit }, { skuId, skuNum }) { 
+        let result = await reqAddOrUpdateShopCart(skuId,skuNum)
+        // 当前这个函数如果执行返回Promise
+        if (result.code == 200) {
+            return "ok"
+        } else {
+            return Promise.reject(new Error('failed'))
         }
     }
 }
